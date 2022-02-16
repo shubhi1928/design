@@ -1,5 +1,10 @@
 <template>
-
+  <div
+    class="relative  font-sans antialiased text-primary-black">
+    <div class="min-h-screen flex flex-col ">
+        <Navbar class="sticky top-0 bg-white" />
+     <div class="flex-1  ">
+        <div class="px-8 md:px-4 max-w-6xl mx-auto text-center">
      <div>
        <div class="mt-10">
             <h2 class="text-xl font-semibold flex flex-start">Overview</h2>
@@ -60,6 +65,11 @@
             <Transactions/>
         </div>
      </div>
+        </div>
+        
+     </div>
+    </div>
+  </div>
   
 </template>
 
@@ -69,6 +79,7 @@ import IncomingIcon from "~/assets/img/incoming.svg?inline";
 import Transactions from "~/components/Transactions.vue";
 
 export default {
+   layout: 'custom',
   components :{
           OutgoingIcon,
           IncomingIcon,
@@ -77,3 +88,7 @@ export default {
   name: 'IndexPage',
 }
 </script>
+<style>
+
+</style>
+
