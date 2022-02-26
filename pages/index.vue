@@ -8,10 +8,10 @@
         <InstadappIcon  class="w-8 h-8 text-white"/>
       <span class="ml-2 font-extrabold text-lg">EXPLORER</span>
     </div>
-      <div class="mt-4 sm:mt-0 sm:mr-1 ">
+      <div class="mt-4  sm:mr-1 ">
           <SearchInput
             dense
-            class="w-[200px]"
+            class="w-full"
             placeholder="Enter wallet Address"
             v-model="walletAddress" @change="allbalance"
           />
@@ -85,8 +85,8 @@
          
         </div> 
 
-    <div class=" rounded-md shadow  border-gray-400 border-2">
-      <table class="w-full font-semibold ">
+    <div class=" rounded-md shadow  border-gray-400 border-2  overflow-auto">
+      <table class="w-full font-semibold">
         <thead class=" border-b-2 border-gray-400">
         <tr class="text-gray-400 bg-white">
           <th class=" p-3 pl-5 w-40  text-sm font-semibold tracking-wide text-left">Assets</th>
