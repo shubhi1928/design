@@ -124,12 +124,11 @@
     <!-- <form @submit.prevent="allbalance">
     
     <input v-model="walletAddress"  @change ="allbalance" placeholder="address" >
-
     </form>
     <p >{{amount[0].balance}}</p>
     <p>{{amount[1].balance}}</p>
      -->
-    
+
 
   </div>
         </div>
@@ -143,7 +142,6 @@
 </template>
 
 <script>
-
 import { defineComponent } from '@vue/composition-api'
 import ExternalLinkIcon from "~/assets/img/external-link.svg?inline";
 import LeftIcon from "~/assets/img/arrow-left.svg?inline";
@@ -152,8 +150,6 @@ import OutgoingIcon from "~/assets/img/outgoing.svg?inline";
 import IncomingIcon from "~/assets/img/incoming.svg?inline";
 import InstadappIcon from "~/assets/img/instadapp-logo-icon.svg?inline";
 import DollarIcon from "~/assets/img/dollar.svg?inline";
-
-
 import DaiIcon from "~/assets/img/dai.svg?inline";
 import UsdtIcon from "~/assets/img/usdt.svg?inline";
 import InstIcon from "~/assets/img/inst.svg?inline";
@@ -162,10 +158,7 @@ import EthIcon from "~/assets/img/eth.svg?inline";
 import WethIcon from "~/assets/img/weth.svg?inline";
 import WbtcIcon from "~/assets/img/wbtc.svg?inline";
 import MaticIcon from "~/assets/img/matic.svg?inline";
-
 // import Web3 from 'web3';
-
-
 export default defineComponent({
   components:{
     ExternalLinkIcon,
@@ -186,15 +179,9 @@ export default defineComponent({
     
   },
     setup() {
-
-      const Web3 = require('web3');
-      const CoinGecko = require('coingecko-api');
-        
-
       var walletAddress=""
       var totalUsd = 0
       var totalETH = 0
-
       var trans = [
         {
           assets:"Ethereum (ETH)",
@@ -202,9 +189,8 @@ export default defineComponent({
           quantity:"0",
           price:"0",
           value:"0",
-          contractaddress:"0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          contractaddress:"-",
           coin_id:"ethereum"
-
         },
          {
           assets:"INSTADAPP (INST)",
@@ -214,8 +200,6 @@ export default defineComponent({
           value:"0",
           contractaddress:"0x6f40d4A6237C257fff2dB00FA0510DeEECd303eb",
           coin_id:"instadapp"
-
-
         },
          {
           assets:"Wrapped Ether (WETH)",
@@ -225,9 +209,7 @@ export default defineComponent({
           value:"0",
           contractaddress:"0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
           coin_id:"weth"
-
         },
-
          {
           assets:"Dai Stablecoin (DAI)",
           symbol:DaiIcon,
@@ -236,7 +218,6 @@ export default defineComponent({
           value:"0",
           contractaddress:"0x6B175474E89094C44Da98b954EedeAC495271d0F",
           coin_id:"dai"
-
         },
          {
           assets:"Tether USD (USDT)",
@@ -246,7 +227,6 @@ export default defineComponent({
           value:"0",
           contractaddress:"0xdAC17F958D2ee523a2206206994597C13D831ec7",
           coin_id:"tether"
-
         },
          {
           assets:"USD Coin (USDC)",
@@ -256,9 +236,6 @@ export default defineComponent({
           value:"0",
           contractaddress:"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
           coin_id:"usd-coin"
-
-          
-
         },
          {
           assets:"Wrapped BTC (WBTC)",
@@ -268,7 +245,6 @@ export default defineComponent({
           value:"0",
           contractaddress:"0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
           coin_id:"wrapped-bitcoin"
-
         },
         {
           assets:"Matic Token (MATIC)",
@@ -278,149 +254,88 @@ export default defineComponent({
           value:"0",
           contractaddress:"0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
           coin_id:"matic-network"
-
         },
         
-
-
-
-
-
       ]
-
       function getaddress(contract){
         return "https://etherscan.io/token/"+contract
       }
       function getwallet(){
         return "https://etherscan.io/tokenholdings?a="+this.walletAddress
       }
-
-
-      async function getprice(ArrayOfcoin_id){
-
-        
+      async function getprice(coin_id){
+        const CoinGecko = require('coingecko-api');
         const CoinGeckoClient = new CoinGecko();
-
         var price = await CoinGeckoClient.simple.price({
-                ids: ArrayOfcoin_id,
+                ids: coin_id,
                 vs_currencies: ['usd'],
             });
-
+       price = price.data[coin_id].usd
             return price;
-
       }
+      async function getBalanceOfERC20(walletAddress,tokenAddress){
+         const Web3 = require('web3');
+         const Web3Client = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/5a30774b8e5143fabbbb8e724b671741"));
+         const minABI = [  
+                // balanceOf
+                {    
+                  constant: true,
+                  inputs: [{ name: "_owner", type: "address" }],
+                  name: "balanceOf",
+                  outputs: [{ name: "balance", type: "uint256" }],
+                  type: "function",
+                },
+              ];
+                const contract = new Web3Client.eth.Contract(minABI, tokenAddress);
+                const result = await contract.methods.balanceOf(walletAddress).call(); 
+
+                console.log(tokenAddress,result)
+  
+                const format = Web3Client.utils.fromWei(result); 
+                
+
+               console.log(tokenAddress,format)
 
 
 
-      async function getbalanceERC20_all(walletAddress,ArrayOfTokenAddress){
-
-              const Web3Client = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/5a30774b8e5143fabbbb8e724b671741"));
-
-              const ABI = [
-                {
-                  "inputs":[{"internalType":"address","name":"owner","type":"address"},
-                            {"internalType":"address[]","name":"tknAddress","type":"address[]"}],
-
-                  "name":"getBalances",
-
-                  "outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],
-
-                  "stateMutability":"view",
-
-                  "type":"function"
-                  
-                  },
-
-              ]
-
-              const resolverAddress = "0x5b7D61b389D12e1f5873d0cCEe7E675915AB5F43"
-
-              const contract = new Web3Client.eth.Contract(ABI, resolverAddress);
-
-              const balances = await contract.methods.getBalances(walletAddress,ArrayOfTokenAddress).call();
-
-
-              
-
-
-              return balances
-
-
-              
-
+                return format
       }
-   
-
-    async function allbalance(){
-
-            this.totalUsd = 0
-
-
-
-
-            const Web3Client = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/5a30774b8e5143fabbbb8e724b671741"));
-
-            var ArrayOfTokenAddress =[]
-            
-
-            for(var i =0; i <this.trans.length; i++){
-              ArrayOfTokenAddress.push(this.trans[i].contractaddress)
-            }
-
-            await getbalanceERC20_all(this.walletAddress,ArrayOfTokenAddress).then((quantity)=>
-            {
-              
-              for(var i =0; i <trans.length; i++){
-                      this.trans[i].quantity =  Web3Client.utils.fromWei(quantity[i])
-
-                      if(trans[i].coin_id==="tether"||trans[i].coin_id==="usd-coin"){
-                        this.trans[i].quantity  = this.trans[i].quantity * 10**12
-                      }
-                    }
+        async function getEth(walletAddress){
+          const Web3 = require("web3")
+           const web3 = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/5a30774b8e5143fabbbb8e724b671741"))
+           const result = await  web3.eth.getBalance(walletAddress);
+            const format = web3.utils.fromWei( web3.utils.toBN(result),"ether");
+            return format
+        }
+           async function allbalance(){
+             this.totalUsd = 0
+             for( var i = 1; i<trans.length;i++){
+               var data = await getBalanceOfERC20(this.walletAddress, this.trans[i].contractaddress ).then((balance)=>{
+                 this.trans[i].quantity = balance
+               })
+               var data1 = await getprice(this.trans[i].coin_id).then((price)=>{
+                 this.trans[i].price = price
+               })
+               this.trans[i].value = this.trans[i].quantity*this.trans[i].price;
+               this.totalUsd += this.trans[i].value
+             }
+             var data1 = await getEth(this.walletAddress).then((balance)=>{
+                 this.trans[0].quantity = balance
+               })
+             var data1 = await getprice(this.trans[0].coin_id).then((price)=>{
+                 this.trans[0].price = price
+               })
+               this.trans[0].value = this.trans[0].quantity*this.trans[0].price;
+               this.totalUsd += this.trans[0].value
+               this.totalETH = this.totalUsd/ this.trans[0].price
+           }
       
-
-            })
-
-            var ArrayOfcoin_id=[]
-
-            for(var i =0; i <this.trans.length; i++){
-               ArrayOfcoin_id.push(this.trans[i].coin_id)
-            }
-
-
-            await getprice(ArrayOfcoin_id).then((price)=>
-            {
-                for(var i =0; i <this.trans.length; i++){
-                      this.trans[i].price =  price.data[trans[i].coin_id].usd
-                  }
-            })
-
-
-            for(var i =0;i<trans.length;i++){
-
-                  trans[i].value = trans[i].price*trans[i].quantity               
-                  this.totalUsd += trans[i].value 
-
-            }
-
-
-            this.totalETH = this.totalUsd/ this.trans[0].price;
-    }
-
-
-
-    
-
-
      
-      return{trans,walletAddress,getbalanceERC20_all,allbalance,totalUsd,totalETH,getaddress,getwallet
+      return{trans,walletAddress,getBalanceOfERC20,allbalance,getEth,totalUsd,totalETH,getaddress,getwallet,getprice
         
       };
     },
 })
 </script>
 <style scoped>
-
 </style>
-
-
