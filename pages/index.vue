@@ -2,6 +2,28 @@
   <div
     class="relative  font-sans antialiased text-primary-black bg-gray-100">
     <div class="min-h-screen flex flex-col ">
+
+ 
+
+
+
+        <div v-if="check_balance===false">
+
+           <div>
+             <button @click="onconnect">Connect wallet</button>
+
+  </div>
+
+
+
+          
+          </div>
+
+
+
+
+      
+      <div v-else>
       
        <div class="sticky top-0 bg-white px-4 md:px-8 py-4 border border-b-[#E7E8F1] shadow flex flex-col md:flex-row md:items-center md:justify-between ">
     <div class="flex items-center ">
@@ -137,6 +159,7 @@
         </div>
         
      </div>
+     </div>
     </div>
   </div>
   
@@ -162,6 +185,9 @@ import EthIcon from "~/assets/img/eth.svg?inline";
 import WethIcon from "~/assets/img/weth.svg?inline";
 import WbtcIcon from "~/assets/img/wbtc.svg?inline";
 import MaticIcon from "~/assets/img/matic.svg?inline";
+import Web3 from "web3";
+import Web3Modal from "web3modal";
+import WalletConnectProvider from "@walletconnect/web3-provider";
 
 
 
@@ -184,7 +210,10 @@ export default defineComponent({
     WethIcon,
     WbtcIcon,
     MaticIcon,
-    DollarIcon
+    DollarIcon,
+    Web3,
+    Web3Modal,
+    WalletConnectProvider
     
   },
     setup() {
@@ -404,6 +433,41 @@ export default defineComponent({
 
             this.check_balance = true
     }
+    async function collect()
+    {
+     
+
+          const providerOptions = {
+                    /* See Provider Options Section */
+                    walletconnect: {
+            package: WalletConnectProvider, // required
+            options: {
+              infuraId: "5a30774b8e5143fabbbb8e724b671741" // required
+          }
+            },
+            binancechainwallet: {
+              package: true
+            }
+          };
+
+          const web3Modal = new Web3Modal({
+            network: "mainnet", // optional
+            cacheProvider: false, // optional
+            providerOptions // required
+          });
+
+          const provider = await web3Modal.connect();
+
+          const web3 = new Web3(provider);
+          const accounts = await web3.eth.getAccounts()
+           return(accounts[0])
+    }
+    async function onconnect(){
+      var address=await collect();
+      this.walletAddres=address;
+      await this.allbalance();
+    }
+
 
 
 
@@ -411,13 +475,15 @@ export default defineComponent({
 
 
      
-      return{trans,walletAddress,getbalanceERC20_all,allbalance,totalUsd,totalETH,getaddress,getwallet,check_balance
+      return{trans,walletAddress,getbalanceERC20_all,allbalance,totalUsd,totalETH,getaddress,getwallet,check_balance,collect,onconnect
         
       };
     },
 })
+
 </script>
 <style scoped>
+
 
 </style>
 
