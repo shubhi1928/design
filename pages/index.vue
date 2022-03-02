@@ -9,10 +9,34 @@
 
         <div v-if="check_balance===false">
 
-           <div>
-             <button @click="onconnect">Connect wallet</button>
+          <div class="flex justify-center items-center h-screen"> 
 
-  </div>
+               <div class="flex flex-col justify-center items-center w-[400px] h-[500px] bg-white rounded-md shadow">
+
+        <InstadappIcon  class="w-16 h-16 text-white mb-4"/>
+      <div class="ml-2 font-extrabold text-xl">LOGIN</div>
+
+
+
+               <p class="mt-12 font-semibold text-gray-500 text-lg"> Connect with wallet</p>
+                  <button @click="onconnect" class="w-[250px] bg-blue-500 h-[40px] border-2 rounded-md p-auto text-white mt-2">Connect wallet</button>
+
+
+                  <p class="mt-8 font-semibold text-gray-500 text-lg">Check balance of any walllet</p>
+                   <SearchInput
+            dense
+            class="mt-2 w-[250px]"
+            placeholder="Enter wallet Address"
+            v-model="walletAddress" @change="allbalance"
+          />
+
+
+            </div>
+
+
+          </div>
+
+          
 
 
 
@@ -30,10 +54,14 @@
         <InstadappIcon  class="w-8 h-8 text-white"/>
       <span class="ml-2 font-extrabold text-lg">EXPLORER</span>
     </div>
-      <div class="mt-4  sm:mr-1 ">
+      
+      <div class="mt-4  sm:mr-1 flex  items-center ">
+
+        <button v-if ="check_myaddress===false" @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4">Connect wallet</button>
+        <button v-else @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4">Check my balance</button>
           <SearchInput
             dense
-            class="w-full"
+            class="w-full h-[45px]"
             placeholder="Enter wallet Address"
             v-model="walletAddress" @change="allbalance"
           />
@@ -221,6 +249,7 @@ export default defineComponent({
       const Web3 = require('web3');
       const CoinGecko = require('coingecko-api');
       var check_balance = false
+      var check_myaddress = false
         
 
       var walletAddress=""
@@ -387,6 +416,8 @@ export default defineComponent({
 
     async function allbalance(){
 
+      console.log(this.walletAddress)
+
             this.totalUsd = 0
 
             var ArrayOfTokenAddress =[]
@@ -458,14 +489,23 @@ export default defineComponent({
 
           const provider = await web3Modal.connect();
 
-          const web3 = new Web3(provider);
-          const accounts = await web3.eth.getAccounts()
+          const Myweb3 = new Web3(provider);
+          const accounts = await Myweb3.eth.getAccounts()
            return(accounts[0])
     }
+
+
     async function onconnect(){
-      var address=await collect();
-      this.walletAddres=address;
+
+
+      var address = await collect();
+      console.log(address)
+      this.walletAddress = address;
+
       await this.allbalance();
+      this.check_myaddress = true
+
+
     }
 
 
@@ -475,7 +515,7 @@ export default defineComponent({
 
 
      
-      return{trans,walletAddress,getbalanceERC20_all,allbalance,totalUsd,totalETH,getaddress,getwallet,check_balance,collect,onconnect
+      return{trans,walletAddress,getbalanceERC20_all,allbalance,totalUsd,totalETH,getaddress,getwallet,check_balance,collect,onconnect,check_myaddress
         
       };
     },
