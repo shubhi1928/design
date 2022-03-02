@@ -2,13 +2,50 @@
   <div
     class="relative  font-sans antialiased text-primary-black bg-gray-100">
     <div class="min-h-screen flex flex-col ">
+
+        <div v-if="check==false">
+         
+
+          <div class="flex justify-center items-center h-screen">
+             
+              <div class= "  flex flex-col justify-center items-center h-screen  bg-white  h-[400px] w-[400px] text-center border-2 rounded-md">
+                <InstadappIcon  class="w-12 h-12 text-white mb-4"/>
+                <span class="ml-2 font-extrabold text-lg  mb-[50px]">EXPLORER</span>
+                
+                     <p >Connect to wallet</p>
+                   <button @click="initWeb3" class=" p-2 m-2 w-[250px]  bg-blue-500 text-white rounded-md" >Connect</button>
+                   <p class=" mt-[10px]">Enter any wallet address</p>
+        <SearchInput
+            dense
+           class="mt-4 w-[250px]"
+            placeholder="Enter wallet Address"
+            v-model="walletAddress" @change="allbalance"
+          />
+
+
+         
+            
+       
+
+          </div>
+
+          </div>
+        
+
+
+        
+    </div>
+    <div v-else>
       
        <div class="sticky top-0 bg-white px-4 md:px-8 py-4 border border-b-[#E7E8F1] shadow flex flex-col md:flex-row md:items-center md:justify-between ">
     <div class="flex items-center ">
         <InstadappIcon  class="w-8 h-8 text-white"/>
       <span class="ml-2 font-extrabold text-lg">EXPLORER</span>
     </div>
-      <div class="mt-4  sm:mr-1 ">
+     
+      <div class="mt-4  sm:mr-1 flex items-center justift-center ">
+        <button v-if="check_self===true " @click="initWeb3" class=" p-2 w-[300px] h-full bg-blue-500 text-white rounded-md mr-4">Check my balance</button>
+        <button v-else @click="initWeb3" class=" p-2 w-[300px] h-full bg-blue-500 text-white rounded-md mr-4">Connect wallet</button>
           <SearchInput
             dense
             class="w-full"
@@ -85,7 +122,7 @@
          
         </div> 
 
-    <div v-if ="check_balance===true" class=" rounded-md shadow  border-gray-400 border-2  overflow-auto">
+    <div class=" rounded-md shadow  border-gray-400 border-2  overflow-auto" v-if="check==true">
       <table class="w-full font-semibold">
         <thead class=" border-b-2 border-gray-400">
         <tr class="text-gray-400 bg-white">
@@ -137,6 +174,7 @@
         </div>
         
      </div>
+     </div>
     </div>
   </div>
   
@@ -164,6 +202,9 @@ import WbtcIcon from "~/assets/img/wbtc.svg?inline";
 import MaticIcon from "~/assets/img/matic.svg?inline";
 
 
+import Web3 from "web3";
+import Web3Modal from "web3modal";
+import WalletConnectProvider from "@walletconnect/web3-provider";
 
 // import Web3 from 'web3';
 
@@ -184,19 +225,23 @@ export default defineComponent({
     WethIcon,
     WbtcIcon,
     MaticIcon,
-    DollarIcon
+    DollarIcon,
+       Web3,
+        Web3Modal,
+        WalletConnectProvider
     
   },
     setup() {
 
-      const Web3 = require('web3');
+      // const Web3 = require('web3');
       const CoinGecko = require('coingecko-api');
-      var check_balance = false
         
 
-      var walletAddress=""
+      var walletAddress=''
       var totalUsd = 0
       var totalETH = 0
+      var check = false
+      var check_self = false
 
       var trans = [
         {
@@ -346,35 +391,44 @@ export default defineComponent({
 
               const resolverAddress = "0x5b7D61b389D12e1f5873d0cCEe7E675915AB5F43"
 
-
-
               const contract = new Web3Client.eth.Contract(ABI, resolverAddress);
 
               const balances = await contract.methods.getBalances(walletAddress,ArrayOfTokenAddress).call();
 
+
+              
+
+
               return balances
+
+
+              
+
       }
    
 
     async function allbalance(){
+      console.log(this.walletAddress)
 
             this.totalUsd = 0
 
+
+
+
+            const Web3Client = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/5a30774b8e5143fabbbb8e724b671741"));
+
             var ArrayOfTokenAddress =[]
             
+
             for(var i =0; i <this.trans.length; i++){
               ArrayOfTokenAddress.push(this.trans[i].contractaddress)
             }
 
-            var quantity = await getbalanceERC20_all(this.walletAddress,ArrayOfTokenAddress)
-            
+           var quantity =  await getbalanceERC20_all(this.walletAddress,ArrayOfTokenAddress)
 
             for(var i =0; i <trans.length; i++){
-                      
-                      this.trans[i].quantity =  quantity[i] / 10**trans[i].decimals
-
-                }
-     
+                      this.trans[i].quantity =  quantity[i]/ 10**trans[i].decimals
+                    }
 
             var ArrayOfcoin_id=[]
 
@@ -383,13 +437,11 @@ export default defineComponent({
             }
 
 
-            var price1 = await getprice(ArrayOfcoin_id)
-            
-    
-            for(var i =0; i <this.trans.length; i++){
-                      this.trans[i].price =  price1.data[trans[i].coin_id].usd
-                }
+            var price = await getprice(ArrayOfcoin_id)
 
+             for(var i =0; i <this.trans.length; i++){
+                      this.trans[i].price =  price.data[trans[i].coin_id].usd
+                  }
 
 
             for(var i =0;i<trans.length;i++){
@@ -401,9 +453,67 @@ export default defineComponent({
 
 
             this.totalETH = this.totalUsd/ this.trans[0].price;
+            this.check = true
 
-            this.check_balance = true
     }
+
+
+     const providerOptions = {
+                                     walletconnect: {
+    package: WalletConnectProvider, // required
+    options: {
+      infuraId: "5a30774b8e5143fabbbb8e724b671741" // required
+    }
+  },
+                                     binancechainwallet: {
+    package: true
+  }
+   }
+
+
+   async function connect(){
+
+    
+
+      const web3Modal = new Web3Modal({
+                    network: "mainnet", // optional
+                    cacheProvider: false, // optional
+                    providerOptions // required
+                    });
+  
+      const provider = await web3Modal.connect()
+
+
+                    
+       const MyWeb = new Web3(provider)
+
+       var address =  await MyWeb.eth.getAccounts()
+       
+          return address[0]
+
+   
+    
+
+   }
+
+   
+
+
+    async function initWeb3 () {
+
+      // Check for web3 provider
+                  var address = await connect()
+
+                    this.walletAddress = address
+
+                    await this.allbalance()
+
+                   this.check = true  
+                   this.check_self= true   
+          
+        
+    }
+
 
 
 
@@ -411,7 +521,7 @@ export default defineComponent({
 
 
      
-      return{trans,walletAddress,getbalanceERC20_all,allbalance,totalUsd,totalETH,getaddress,getwallet,check_balance
+      return{trans,walletAddress,getbalanceERC20_all,allbalance,totalUsd,totalETH,getaddress,getwallet,initWeb3,connect,check,check_self
         
       };
     },
@@ -420,5 +530,23 @@ export default defineComponent({
 <style scoped>
 
 </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
