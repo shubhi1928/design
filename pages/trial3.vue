@@ -56,9 +56,10 @@
     </div>
       
       <div class="mt-4  sm:mr-1 flex  items-center ">
-        <button v-if ="check_myaddress!==false" @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-2 text-sm">Connect another wallet </button>
-        <button v-if ="check_myaddress===false" @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4 text-sm">Connect wallet</button>
-        <button v-else @click="onconnect1" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4 text-sm">Check my balance</button>
+        <button v-if ="check_myaddress===true" @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-2 text-sm ml-2">Connect another wallet</button>
+
+        <button v-if ="check_myaddress===false" @click="onconnect" class="w-[200px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4 text-sm">Connect wallet</button>
+        <button v-else @click="onconnect1" class="w-[220px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4 text-sm">Check my balance</button>
           <SearchInput
             dense
             class="w-full h-[45px]"
@@ -216,7 +217,8 @@ import MaticIcon from "~/assets/img/matic.svg?inline";
 import Web3 from "web3";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import VueCookies from 'vue-cookies';
+import VueCookies  from 'vue-cookies'
+
 
 
 
@@ -224,6 +226,7 @@ import VueCookies from 'vue-cookies';
 
 
 export default defineComponent({
+
   components:{
     ExternalLinkIcon,
     LeftIcon,
@@ -243,34 +246,46 @@ export default defineComponent({
     Web3,
     Web3Modal,
     WalletConnectProvider,
-    VueCookies
+    VueCookies ,
+
     
   },
     setup() {
+      
 
       const Web3 = require('web3');
       const CoinGecko = require('coingecko-api');
       var check_balance = false
-      var check_myaddress = false
-      var my_address
-      
-        if(VueCookies.isKey('check_balance'))
-        {
-          check_balance=VueCookies.get('check_balance')
-        }
-         if(VueCookies.isKey('check_myaddress'))
-        {
-          check_myaddress=VueCookies.get('check_myaddress')
-        }
-         if(VueCookies.isKey('my_address'))
-        {
-          my_address=VueCookies.get('my_address')
-        }
+      var check_myaddress  = false
+      var my_address =""
 
-        // VueCookies.remove("my_address")
-        // VueCookies.remove("check_myaddress")
-        // VueCookies.remove("check_balance")
+         if(localStorage.getItem("check_balance",false)){
+               check_balance = localStorage.getItem("check_balance");
+               console.log(check_balance)
+      }
+      else {
+         check_balance = false
+      }
 
+       if(localStorage.getItem("check_myaddress",false)){
+               check_myaddress = localStorage.getItem("check_myaddress");
+               console.log(check_myaddress)
+      }
+      else {
+         check_myaddress = false
+      }
+
+       if(localStorage.getItem("my_address",false)){
+               my_address = localStorage.getItem("my_address");
+               
+      }
+      else {
+         my_address = ""
+      }
+        
+      //  VueCookies.remove("VueCookies")
+      //  VueCookies.remove("check_myaddress")
+      //  VueCookies.remove("check_balance")
       var walletAddress=""
       var totalUsd = 0
       var totalETH = 0
@@ -482,9 +497,9 @@ export default defineComponent({
             this.totalETH = this.totalUsd/ this.trans[0].price;
 
             this.check_balance = true
-            VueCookies.set('check_balance',true,'1h')
+            localStorage.setItem("check_balance", true)
+            
     }
-
     async function collect()
     {
      
@@ -512,7 +527,14 @@ export default defineComponent({
 
           const Myweb3 = new Web3(provider);
           const accounts = await Myweb3.eth.getAccounts()
+
+          localStorage.setItem("my_address", accounts[0])
+          
+
+
            return(accounts[0])
+
+
     }
 
 
@@ -525,16 +547,11 @@ export default defineComponent({
 
       this.my_address = address;
 
-
-     
-
-
       await this.allbalance();
       this.check_myaddress = true
-
-      VueCookies.set('check_myaddress',true,'1h')
-      VueCookies.set('my_address',address,'1h')
+      localStorage.setItem("check_myaddress", true)
       
+
 
 
     }
@@ -542,13 +559,14 @@ export default defineComponent({
     async function onconnect1(){
 
       this.walletAddress = this.my_address
+      console.log(this.walletAddress)
       await this.allbalance();
 
     }
 
     
 
-
+   
 
 
     
@@ -558,7 +576,7 @@ export default defineComponent({
       return{trans,walletAddress,getbalanceERC20_all,allbalance,totalUsd,totalETH,getaddress,getwallet,check_balance,collect,onconnect,check_myaddress,my_address,onconnect1
         
       };
-    },
+    }
 })
 
 </script>
