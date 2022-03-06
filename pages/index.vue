@@ -56,9 +56,9 @@
     </div>
       
       <div class="mt-4  sm:mr-1 flex  items-center ">
-
-        <button v-if ="check_myaddress===false" @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4">Connect wallet</button>
-        <button v-else @click="onconnect1" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4">Check my balance</button>
+        <button v-if ="check_myaddress===true" @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-2 text-sm">Connect another wallet</button>
+        <button v-if ="check_myaddress===false" @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4 text-sm">Connect wallet</button>
+        <button v-else @click="onconnect1" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4 text-sm">Check my balance</button>
           <SearchInput
             dense
             class="w-full h-[45px]"
@@ -216,6 +216,7 @@ import MaticIcon from "~/assets/img/matic.svg?inline";
 import Web3 from "web3";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
+import VueCookies from 'vue-cookies';
 
 
 
@@ -241,7 +242,8 @@ export default defineComponent({
     DollarIcon,
     Web3,
     Web3Modal,
-    WalletConnectProvider
+    WalletConnectProvider,
+    VueCookies
     
   },
     setup() {
@@ -251,7 +253,18 @@ export default defineComponent({
       var check_balance = false
       var check_myaddress = false
       var my_address
-        
+        if(VueCookies.isKey('check_balance'))
+        {
+          this.check_balance=VueCookies.get('check_balance')
+        }
+         if(VueCookies.isKey('check_myaddress'))
+        {
+          this.check_myaddress=VueCookies.get('check_myaddress')
+        }
+         if(VueCookies.isKey('my_address'))
+        {
+          this.my_address=VueCookies.get('my_address')
+        }
 
       var walletAddress=""
       var totalUsd = 0
@@ -464,6 +477,7 @@ export default defineComponent({
             this.totalETH = this.totalUsd/ this.trans[0].price;
 
             this.check_balance = true
+            VueCookies.set('check_balance',true,'1h')
     }
     async function collect()
     {
@@ -504,9 +518,13 @@ export default defineComponent({
       this.walletAddress = address;
 
       this.my_address = address;
+      VueCookies.set('my_address',address,'1h')
+
 
       await this.allbalance();
       this.check_myaddress = true
+       VueCookies.set('check_myaddress',true,'1h')
+      
 
 
     }
