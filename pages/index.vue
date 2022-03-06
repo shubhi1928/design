@@ -58,7 +58,7 @@
       <div class="mt-4  sm:mr-1 flex  items-center ">
 
         <button v-if ="check_myaddress===false" @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4">Connect wallet</button>
-        <button v-else @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4">Check my balance</button>
+        <button v-else @click="onconnect1" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4">Check my balance</button>
           <SearchInput
             dense
             class="w-full h-[45px]"
@@ -250,6 +250,7 @@ export default defineComponent({
       const CoinGecko = require('coingecko-api');
       var check_balance = false
       var check_myaddress = false
+      var my_address
         
 
       var walletAddress=""
@@ -502,11 +503,22 @@ export default defineComponent({
       console.log(address)
       this.walletAddress = address;
 
+      this.my_address = address;
+
       await this.allbalance();
       this.check_myaddress = true
 
 
     }
+
+    async function onconnect1(){
+
+      this.walletAddress = this.my_address
+      await this.allbalance();
+
+    }
+
+    
 
 
 
@@ -515,7 +527,7 @@ export default defineComponent({
 
 
      
-      return{trans,walletAddress,getbalanceERC20_all,allbalance,totalUsd,totalETH,getaddress,getwallet,check_balance,collect,onconnect,check_myaddress
+      return{trans,walletAddress,getbalanceERC20_all,allbalance,totalUsd,totalETH,getaddress,getwallet,check_balance,collect,onconnect,check_myaddress,my_address,onconnect1
         
       };
     },
