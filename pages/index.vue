@@ -56,7 +56,7 @@
     </div>
       
       <div class="mt-4  sm:mr-1 flex  items-center ">
-        <button v-if ="check_myaddress!==false" @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-2 text-sm">Connect another wallet </button>
+        <div v-if ="check_myaddress!==false" class=" p-auto text-blue-500 mr-2 text-lg flex justify-center font-bold">CONNECTED</div>
         <button v-if ="check_myaddress===false" @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4 text-sm">Connect wallet</button>
         <button v-else @click="onconnect1" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4 text-sm">Check my balance</button>
           <SearchInput
@@ -159,7 +159,7 @@
           <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">${{parseFloat(tran.price).toFixed(3)}}</td>
           <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">${{parseFloat(tran.value).toFixed(3)}}</td>
           <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">
-            <a :href="getaddress(tran.contractaddress)" class="font-bold text-blue-500 hover:underline flex">{{tran.contractaddress.slice(0,30)}}...<ExternalLinkIcon class="w-4 h-4"/></a>
+            <a target="_blank" :href="getaddress(tran.contractaddress)" class="font-bold text-blue-500 hover:underline flex">{{tran.contractaddress.slice(0,30)}}...<ExternalLinkIcon class="w-4 h-4"/></a>
           </td>
            
         </tr>
