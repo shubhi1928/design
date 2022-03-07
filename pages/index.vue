@@ -129,7 +129,7 @@
    <div class="flex place-content-between">
      <div class="flex mb-2">
        <h1 class="flex flex-start text-black-400 text-lg font-semibold">Assets in wallet</h1>
-       <a :href="getwallet()" class="text-blue-600 font-semibold">({{walletAddress.slice(0,5)}}...{{walletAddress.slice(-4)}})</a>
+       <a target="_blank" :href="getwallet()" class="text-blue-600 font-semibold">({{walletAddress.slice(0,5)}}...{{walletAddress.slice(-4)}})</a>
      </div>
   
          
