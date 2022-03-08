@@ -59,12 +59,20 @@
         <button v-if ="check_myaddress===true" @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-2 text-sm">Connect another wallet</button>
         <button v-if ="check_myaddress===false" @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4 text-sm">Connect wallet</button>
         <button v-else @click="onconnect1" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4 text-sm">Check my balance</button>
+
           <SearchInput
             dense
             class="w-full h-[45px]"
             placeholder="Enter wallet Address"
             v-model="walletAddress" @change="allbalance"
           />
+          <select v-model="net">
+          <option disabled value="">Select Chain</option>
+          <option>mainnet</option>
+          <option>polygon</option>
+
+</select>
+
         </div>
       
           </div>
@@ -158,8 +166,11 @@
           <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">{{parseFloat(tran.quantity).toFixed(3)}}</td>
           <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">${{parseFloat(tran.price).toFixed(3)}}</td>
           <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">${{parseFloat(tran.value).toFixed(3)}}</td>
-          <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">
+          <td   v-if="net=='mainnet'" class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">
             <a :href="getaddress(tran.contractaddress)" class="font-bold text-blue-500 hover:underline flex">{{tran.contractaddress.slice(0,30)}}...<ExternalLinkIcon class="w-4 h-4"/></a>
+          </td>
+          <td v-else class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">
+            <a :href="getaddress(tran.contractaddress_polygon)" class="font-bold text-blue-500 hover:underline flex">{{tran.contractaddress_polygon.slice(0,30)}}...<ExternalLinkIcon class="w-4 h-4"/></a>
           </td>
            
         </tr>
@@ -252,6 +263,7 @@ export default defineComponent({
       const CoinGecko = require('coingecko-api');
       var check_balance = false
       var check_myaddress = false
+      var net = 'mainnet'
       var my_address
         if(VueCookies.isKey('check_balance'))
         {
@@ -278,6 +290,7 @@ export default defineComponent({
           price:"0",
           value:"0",
           contractaddress:"0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          contractaddress_polygon:"0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
           coin_id:"ethereum",
           decimals:18
 
@@ -289,6 +302,7 @@ export default defineComponent({
           price:"0",
           value:"0",
           contractaddress:"0x6f40d4A6237C257fff2dB00FA0510DeEECd303eb",
+          contractaddress_polygon:"0xf50D05A1402d0adAfA880D36050736f9f6ee7dee",
           coin_id:"instadapp",
           decimals:18
 
@@ -301,6 +315,7 @@ export default defineComponent({
           price:"0",
           value:"0",
           contractaddress:"0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          contractaddress_polygon:"0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
           coin_id:"weth",
           decimals:18
 
@@ -313,6 +328,7 @@ export default defineComponent({
           price:"0",
           value:"0",
           contractaddress:"0x6B175474E89094C44Da98b954EedeAC495271d0F",
+          contractaddress_polygon:"0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
           coin_id:"dai",
           decimals:18
 
@@ -324,6 +340,7 @@ export default defineComponent({
           price:"0",
           value:"0",
           contractaddress:"0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          contractaddress_polygon:"0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
           coin_id:"tether",
           decimals:6
 
@@ -335,6 +352,7 @@ export default defineComponent({
           price:"0",
           value:"0",
           contractaddress:"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          contractaddress_polygon:"0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
           coin_id:"usd-coin",
           decimals:6
 
@@ -348,6 +366,7 @@ export default defineComponent({
           price:"0",
           value:"0",
           contractaddress:"0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+          contractaddress_polygon:"0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6",
           coin_id:"wrapped-bitcoin",
           decimals:8
 
@@ -359,6 +378,7 @@ export default defineComponent({
           price:"0",
           value:"0",
           contractaddress:"0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
+          contractaddress_polygon:"0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
           coin_id:"matic-network",
           decimals:18
 
@@ -372,10 +392,25 @@ export default defineComponent({
       ]
 
       function getaddress(contract){
+        if(this.net=='mainnet')
+        {
+  
         return "https://etherscan.io/token/"+contract
+        }
+        else
+        {
+          return "https://polygonscan.com/token/"+contract
+        }
       }
       function getwallet(){
+        if(this.net=='mainnet')
+        {
         return "https://etherscan.io/tokenholdings?a="+this.walletAddress
+        }
+        else
+        {
+        return "https://polygonscan.com/tokenholdings?a="+this.walletAddress
+        }
       }
 
 
@@ -396,9 +431,16 @@ export default defineComponent({
 
 
       async function getbalanceERC20_all(walletAddress,ArrayOfTokenAddress){
-
-              const Web3Client = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/5a30774b8e5143fabbbb8e724b671741"));
-
+              var Web3Client
+              if(this.net=='mainnet')
+              {
+               Web3Client = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/5a30774b8e5143fabbbb8e724b671741"));
+              }
+              else 
+              {
+                 Web3Client = new Web3(new Web3.providers.HttpProvider("https://polygon-rpc.com/"));
+              
+              }
               const ABI = [
                 {
                   "inputs":[{"internalType":"address","name":"owner","type":"address"},
@@ -415,8 +457,16 @@ export default defineComponent({
                   },
 
               ]
+              var resolverAddress
+              if(this.net=='mainnet')
+              {
+              resolverAddress = "0x5b7D61b389D12e1f5873d0cCEe7E675915AB5F43"
+              }
+              else
+              {
+              resolverAddress = "0x58632D23120b20650262b8A629a14e4F4043E0D9"
+              }
 
-              const resolverAddress = "0x5b7D61b389D12e1f5873d0cCEe7E675915AB5F43"
 
 
 
@@ -436,17 +486,30 @@ export default defineComponent({
 
             var ArrayOfTokenAddress =[]
             
-            for(var i =0; i <this.trans.length; i++){
+            for(var i =0; i <this.trans.length; i++)
+            {
+              if(this.net=='mainnet')
+              {
               ArrayOfTokenAddress.push(this.trans[i].contractaddress)
+              }
+              else
+              {
+              ArrayOfTokenAddress.push(this.trans[i].contractaddress_polygon)
+              }
             }
 
-            var quantity = await getbalanceERC20_all(this.walletAddress,ArrayOfTokenAddress)
+            var quantity = await this.getbalanceERC20_all(this.walletAddress,ArrayOfTokenAddress)
             
 
             for(var i =0; i <trans.length; i++){
                       
                       this.trans[i].quantity =  quantity[i] / 10**trans[i].decimals
 
+
+                }
+                if(this.net=='polygon')
+                {
+                  this.trans[0].quantity=0
                 }
      
 
@@ -497,7 +560,7 @@ export default defineComponent({
           };
 
           const web3Modal = new Web3Modal({
-            network: "mainnet", // optional
+            network: this.net, // optional
             cacheProvider: false, // optional
             providerOptions // required
           });
@@ -513,7 +576,7 @@ export default defineComponent({
     async function onconnect(){
 
 
-      var address = await collect();
+      var address = await this.collect();
       console.log(address)
       this.walletAddress = address;
 
