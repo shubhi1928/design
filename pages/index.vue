@@ -56,20 +56,19 @@
     </div>
       
       <div class="mt-4  sm:mr-1 flex  items-center ">
-        <div v-if ="check_myaddress!==false" class=" p-auto text-blue-500 mr-2 text-lg flex justify-center font-bold">CONNECTED</div>
+        
         <button v-if ="check_myaddress===false" @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4 text-sm">Connect wallet</button>
-        <button v-else @click="onconnect1" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4 text-sm">Check my balance</button>
+        <button v-else @click="onconnect1" class="w-[150px] bg-blue-500 h-[42px] border-2 rounded-md p-auto text-white mr-4 text-sm">Check my balance</button>
 
           <SearchInput
             dense
-            class="w-full h-[45px]"
+            class="w-[300px] h-[45px]"
             placeholder="Enter wallet Address"
             v-model="walletAddress" @change="allbalance"
           />
-          <select v-model="net">
-          <option disabled value="">Select Chain</option>
-          <option>mainnet</option>
-          <option>polygon</option>
+          <select v-model="net" @change="allbalance"  class="w-[150px] h-[45px] ml-2 rounded-lg border-2 border-gray-300 text-gray-500">  
+          <option class=" rounded-lg border-2 border-gray-300 text-gray-500">mainnet</option>
+          <option class=" rounded-lg border-2 border-gray-300 text-gray-500">polygon</option>
 
 </select>
 
@@ -81,7 +80,10 @@
         <div class="px-8 md:px-4 max-w-6xl mx-auto text-center">
      <div >
        <div class="mt-10">
-            <h2 class="text-xl font-semibold flex flex-start">Overview</h2>
+
+           <h2 class="text-xl font-semibold flex flex-start ">Overview </h2>
+  
+            
 
 
               <div class="px-1 mt-6 grid w-full grid-cols-1 gap-4 md:grid-cols-3 xl:gap-[18px] ">
@@ -168,12 +170,12 @@
           <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">${{parseFloat(tran.value).toFixed(3)}}</td>
 
           <td   v-if="net=='mainnet'" class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">
-            <a :href="getaddress(tran.contractaddress)" class="font-bold text-blue-500 hover:underline flex">{{tran.contractaddress.slice(0,30)}}...<ExternalLinkIcon class="w-4 h-4"/></a>
-=======
+            <a  target="_blank" :href="getaddress(tran.contractaddress)" class="font-bold text-blue-500 hover:underline flex">{{tran.contractaddress.slice(0,30)}}...<ExternalLinkIcon class="w-4 h-4"/></a>
+
 
           </td>
           <td v-else class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">
-            <a :href="getaddress(tran.contractaddress_polygon)" class="font-bold text-blue-500 hover:underline flex">{{tran.contractaddress_polygon.slice(0,30)}}...<ExternalLinkIcon class="w-4 h-4"/></a>
+            <a v-if="tran.coin_id!='ethereum'" target="_blank" :href="getaddress(tran.contractaddress_polygon)" class="font-bold text-blue-500 hover:underline flex">{{tran.contractaddress_polygon.slice(0,30)}}...<ExternalLinkIcon class="w-4 h-4"/></a>
           </td>
            
         </tr>
@@ -621,7 +623,7 @@ export default defineComponent({
 
 
      
-      return{trans,walletAddress,getbalanceERC20_all,allbalance,totalUsd,totalETH,getaddress,getwallet,check_balance,collect,onconnect,check_myaddress,my_address,onconnect1
+      return{trans,walletAddress,getbalanceERC20_all,allbalance,totalUsd,totalETH,getaddress,getwallet,check_balance,collect,onconnect,check_myaddress,my_address,onconnect1,net
         
       };
     },

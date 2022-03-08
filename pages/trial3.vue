@@ -56,16 +56,22 @@
     </div>
       
       <div class="mt-4  sm:mr-1 flex  items-center ">
-        <button v-if ="check_myaddress===true" @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-2 text-sm ml-2">Connect another wallet</button>
-
-        <button v-if ="check_myaddress===false" @click="onconnect" class="w-[200px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4 text-sm">Connect wallet</button>
-        <button v-else @click="onconnect1" class="w-[220px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4 text-sm">Check my balance</button>
+        <div v-if ="check_myaddress!==false" class=" p-auto text-blue-500 mr-2 text-lg flex justify-center font-bold">CONNECTED</div>
+        <button v-if ="check_myaddress===false" @click="onconnect" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4 text-sm">Connect wallet</button>
+        <button v-else @click="onconnect1" class="w-[300px] bg-blue-500 h-[45px] border-2 rounded-md p-auto text-white mr-4 text-sm">Check my balance</button>
           <SearchInput
             dense
             class="w-full h-[45px]"
             placeholder="Enter wallet Address"
             v-model="walletAddress" @change="allbalance"
           />
+
+          <select v-model="net" @change="onconnect">
+              <option disabled value="">Please select one</option>
+              <option>mainnet</option>
+              <option>polygon</option>
+          </select>
+  
         </div>
       
           </div>
@@ -130,7 +136,7 @@
    <div class="flex place-content-between">
      <div class="flex mb-2">
        <h1 class="flex flex-start text-black-400 text-lg font-semibold">Assets in wallet</h1>
-       <a :href="getwallet()" class="text-blue-600 font-semibold">({{walletAddress.slice(0,5)}}...{{walletAddress.slice(-4)}})</a>
+       <a target="_blank" :href="getwallet()" class="text-blue-600 font-semibold">({{walletAddress.slice(0,5)}}...{{walletAddress.slice(-4)}})</a>
      </div>
   
          
@@ -151,18 +157,22 @@
 
         <tbody class="divide-y divide-gray-100">  
 
-        <tr v-for="tran in trans" :key="tran.coin_id" class="bg-white">
-          <td class="p-2.5 pl-5 text-sm text-gray-400 font-bold whitespace-nowrap text-left">{{tran.assets}}</td>
-          <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap ">    
-             <component :is="tran.symbol" class="w-6 h-6 ml-3" />
-             </td>
-          <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">{{parseFloat(tran.quantity).toFixed(3)}}</td>
-          <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">${{parseFloat(tran.price).toFixed(3)}}</td>
-          <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">${{parseFloat(tran.value).toFixed(3)}}</td>
-          <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">
-            <a :href="getaddress(tran.contractaddress)" class="font-bold text-blue-500 hover:underline flex">{{tran.contractaddress.slice(0,30)}}...<ExternalLinkIcon class="w-4 h-4"/></a>
-          </td>
-           
+        <tr v-for="tran in trans"  :key="tran.coin_id"  class="bg-white">
+
+
+
+              <td class="p-2.5 pl-5 text-sm text-gray-400 font-bold whitespace-nowrap text-left" v-if="net!=='polygon' && tran.coin_id!=='etherum'">{{tran.assets}}</td>
+              <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap ">    
+                <component :is="tran.symbol" class="w-6 h-6 ml-3" v-if="net!=='polygon' && tran.coin_id!=='etherum'"/>
+                </td>
+              <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left" v-if="net!=='polygon' && tran.coin_id!=='etherum'">{{parseFloat(tran.quantity).toFixed(3)}}</td>
+              <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left" v-if="net!=='polygon' && tran.coin_id!=='etherum'">${{parseFloat(tran.price).toFixed(3)}}</td>
+              <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left" v-if="net!=='polygon' && tran.coin_id!=='etherum'">${{parseFloat(tran.value).toFixed(3)}}</td>
+              <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left" v-if="net!=='polygon' && tran.coin_id!=='etherum'">
+                <a target="_blank" :href="getaddress(tran.contractaddress)" class="font-bold text-blue-500 hover:underline flex">{{tran.contractaddress.slice(0,30)}}...<ExternalLinkIcon class="w-4 h-4"/></a>
+              </td>
+   
+  
         </tr>
         <tr>
             <td colspan="7"> <div class=" flex w-full justify-center h-10 items-center bg-white"><LeftIcon class="w-3 h-3 text-blue-200 mr-4"/>Page 1 of 7<RightIcon class="w-3 h-3 text-blue-600 ml-4"/></div></td>
@@ -217,8 +227,7 @@ import MaticIcon from "~/assets/img/matic.svg?inline";
 import Web3 from "web3";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import VueCookies  from 'vue-cookies'
-
+import VueCookies from 'vue-cookies';
 
 
 
@@ -226,7 +235,6 @@ import VueCookies  from 'vue-cookies'
 
 
 export default defineComponent({
-
   components:{
     ExternalLinkIcon,
     LeftIcon,
@@ -246,46 +254,35 @@ export default defineComponent({
     Web3,
     Web3Modal,
     WalletConnectProvider,
-    VueCookies ,
-
+    VueCookies
     
   },
     setup() {
-      
 
       const Web3 = require('web3');
       const CoinGecko = require('coingecko-api');
       var check_balance = false
-      var check_myaddress  = false
-      var my_address =""
+      var check_myaddress = false
+      var my_address
+      var net ="mainnet"
+      
+        if(VueCookies.isKey('check_balance'))
+        {
+          check_balance=VueCookies.get('check_balance')
+        }
+         if(VueCookies.isKey('check_myaddress'))
+        {
+          check_myaddress=VueCookies.get('check_myaddress')
+        }
+         if(VueCookies.isKey('my_address'))
+        {
+          my_address=VueCookies.get('my_address')
+        }
 
-         if(localStorage.getItem("check_balance",false)){
-               check_balance = localStorage.getItem("check_balance");
-               console.log(check_balance)
-      }
-      else {
-         check_balance = false
-      }
+        // VueCookies.remove("my_address")
+        // VueCookies.remove("check_myaddress")
+        // VueCookies.remove("check_balance")
 
-       if(localStorage.getItem("check_myaddress",false)){
-               check_myaddress = localStorage.getItem("check_myaddress");
-               console.log(check_myaddress)
-      }
-      else {
-         check_myaddress = false
-      }
-
-       if(localStorage.getItem("my_address",false)){
-               my_address = localStorage.getItem("my_address");
-               
-      }
-      else {
-         my_address = ""
-      }
-        
-      //  VueCookies.remove("VueCookies")
-      //  VueCookies.remove("check_myaddress")
-      //  VueCookies.remove("check_balance")
       var walletAddress=""
       var totalUsd = 0
       var totalETH = 0
@@ -417,7 +414,13 @@ export default defineComponent({
 
       async function getbalanceERC20_all(walletAddress,ArrayOfTokenAddress){
 
-              const Web3Client = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/5a30774b8e5143fabbbb8e724b671741"));
+             var Web3Client
+
+
+           
+                Web3Client = new Web3(new Web3.providers.HttpProvider("https://mainnet.infura.io/v3/5a30774b8e5143fabbbb8e724b671741"));
+
+            
 
               const ABI = [
                 {
@@ -460,7 +463,7 @@ export default defineComponent({
               ArrayOfTokenAddress.push(this.trans[i].contractaddress)
             }
 
-            var quantity = await getbalanceERC20_all(this.walletAddress,ArrayOfTokenAddress)
+            var quantity = await this.getbalanceERC20_all(this.walletAddress,ArrayOfTokenAddress)
             
 
             for(var i =0; i <trans.length; i++){
@@ -497,9 +500,9 @@ export default defineComponent({
             this.totalETH = this.totalUsd/ this.trans[0].price;
 
             this.check_balance = true
-            localStorage.setItem("check_balance", true)
-            
+            VueCookies.set('check_balance',true,'1h')
     }
+
     async function collect()
     {
      
@@ -516,9 +519,9 @@ export default defineComponent({
               package: true
             }
           };
-
+         console.log(this.net)
           const web3Modal = new Web3Modal({
-            network: "mainnet", // optional
+            network: this.net, // optional
             cacheProvider: false, // optional
             providerOptions // required
           });
@@ -527,31 +530,29 @@ export default defineComponent({
 
           const Myweb3 = new Web3(provider);
           const accounts = await Myweb3.eth.getAccounts()
-
-          localStorage.setItem("my_address", accounts[0])
-          
-
-
            return(accounts[0])
-
-
     }
 
 
     async function onconnect(){
 
 
-      var address = await collect();
+      var address = await this.collect();
       console.log(address)
       this.walletAddress = address;
 
       this.my_address = address;
 
+
+     
+
+
       await this.allbalance();
       this.check_myaddress = true
-      localStorage.setItem("check_myaddress", true)
-      
 
+      VueCookies.set('check_myaddress',true,'1h')
+      VueCookies.set('my_address',address,'1h')
+      
 
 
     }
@@ -559,24 +560,23 @@ export default defineComponent({
     async function onconnect1(){
 
       this.walletAddress = this.my_address
-      console.log(this.walletAddress)
       await this.allbalance();
 
     }
 
     
 
-   
+
 
 
     
 
 
      
-      return{trans,walletAddress,getbalanceERC20_all,allbalance,totalUsd,totalETH,getaddress,getwallet,check_balance,collect,onconnect,check_myaddress,my_address,onconnect1
+      return{trans,walletAddress,getbalanceERC20_all,allbalance,totalUsd,totalETH,getaddress,getwallet,check_balance,collect,onconnect,check_myaddress,my_address,onconnect1,net
         
       };
-    }
+    },
 })
 
 </script>
