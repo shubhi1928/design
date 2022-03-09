@@ -498,6 +498,13 @@ export default defineComponent({
 
     async function allbalance(){
 
+          if(window.ethereum.networkVersion==137){
+                net = 'polygon'
+            }
+            else{
+              net = "mainnet"
+            }
+
       console.log(this.walletAddress)
 
             this.totalUsd = 0
