@@ -269,13 +269,8 @@ export default defineComponent({
       const CoinGecko = require('coingecko-api');
       var check_balance = false
       var check_myaddress = false
-      var net 
-      if(window.ethereum.networkVersion==137){
-          net = 'polygon'
-      }
-      else{
-        net = "mainnet"
-      }
+      var net ="mainnet"
+ 
       
       var my_address
       
@@ -496,14 +491,19 @@ export default defineComponent({
       }
    
 
-    async function allbalance(){
+    async function allbalance( check_self = false){
 
-          if(window.ethereum.networkVersion==137){
-                net = 'polygon'
+      if(check_self===true){
+           if(window.ethereum.networkVersion==137){
+                this.net = 'polygon'
             }
             else{
-              net = "mainnet"
+              this.net = "mainnet"
             }
+
+      }
+
+       
 
       console.log(this.walletAddress)
 
@@ -612,7 +612,7 @@ export default defineComponent({
      
 
 
-      await this.allbalance();
+      await this.allbalance( true);
       this.check_myaddress = true
 
       VueCookies.set('check_myaddress',true,'1h')
