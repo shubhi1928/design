@@ -263,12 +263,20 @@ export default defineComponent({
     
   },
     setup() {
+      
 
       const Web3 = require('web3');
       const CoinGecko = require('coingecko-api');
       var check_balance = false
       var check_myaddress = false
-      var net = 'mainnet'
+      var net 
+      if(window.ethereum.networkVersion==137){
+          net = 'polygon'
+      }
+      else{
+        net = "mainnet"
+      }
+      
       var my_address
       
         if(VueCookies.isKey('check_balance'))
