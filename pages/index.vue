@@ -161,20 +161,20 @@
         <tbody class="divide-y divide-gray-100">  
 
         <tr v-for="tran in trans" :key="tran.coin_id" class="bg-white">
-          <td class="p-2.5 pl-5 text-sm text-gray-400 font-bold whitespace-nowrap text-left">{{tran.assets}}</td>
-          <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap ">    
+          <td class="p-2.5 pl-5 text-sm text-gray-400 font-bold whitespace-nowrap text-left" v-if=" net=='mainnet' || tran.coin_id!='ethereum'  ">{{tran.assets}}</td>
+          <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap " v-if=" net=='mainnet' || tran.coin_id!='ethereum'  ">    
              <component :is="tran.symbol" class="w-6 h-6 ml-3" />
              </td>
-          <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">{{parseFloat(tran.quantity).toFixed(3)}}</td>
-          <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">${{parseFloat(tran.price).toFixed(3)}}</td>
-          <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">${{parseFloat(tran.value).toFixed(3)}}</td>
+          <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left" v-if=" net=='mainnet' || tran.coin_id!='ethereum'  ">{{parseFloat(tran.quantity).toFixed(3)}}</td>
+          <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left" v-if=" net=='mainnet' || tran.coin_id!='ethereum'  ">${{parseFloat(tran.price).toFixed(3)}}</td>
+          <td class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left" v-if=" net=='mainnet' || tran.coin_id!='ethereum'  ">${{parseFloat(tran.value).toFixed(3)}}</td>
 
-          <td   v-if="net=='mainnet'" class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">
+          <td   v-if="net=='mainnet'" class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left" >
             <a  target="_blank" :href="getaddress(tran.contractaddress)" class="font-bold text-blue-500 hover:underline flex">{{tran.contractaddress.slice(0,30)}}...<ExternalLinkIcon class="w-4 h-4"/></a>
 
 
           </td>
-          <td v-else class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left">
+          <td v-if=" net=='polygon' &&  tran.coin_id!='ethereum'  " class="p-2.5 text-sm text-gray-700 whitespace-nowrap text-left" >
             <a v-if="tran.coin_id!='ethereum'" target="_blank" :href="getaddress(tran.contractaddress_polygon)" class="font-bold text-blue-500 hover:underline flex">{{tran.contractaddress_polygon.slice(0,30)}}...<ExternalLinkIcon class="w-4 h-4"/></a>
           </td>
            
@@ -442,14 +442,15 @@ export default defineComponent({
       }
 
       function compare( a, b ) {
+
               if ( a.value < b.value ){
                 return 1;
               }
               if ( a.value > b.value ){
                 return -1;
               }
-                  return 0;
-                        }
+                  return 0;        
+          }
 
 
 
