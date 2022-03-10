@@ -441,6 +441,18 @@ export default defineComponent({
 
       }
 
+      function compare( a, b ) {
+              if ( a.value < b.value ){
+                return 1;
+              }
+              if ( a.value > b.value ){
+                return -1;
+              }
+                  return 0;
+                        }
+
+
+
 
 
       async function getbalanceERC20_all(walletAddress,ArrayOfTokenAddress){
@@ -552,6 +564,8 @@ export default defineComponent({
                       this.trans[i].price =  price1.data[trans[i].coin_id].usd
                 }
 
+                
+
 
 
             for(var i =0;i<trans.length;i++){
@@ -560,6 +574,8 @@ export default defineComponent({
                   this.totalUsd += trans[i].value 
 
             }
+
+            this.trans.sort( compare );
 
 
             this.totalETH = this.totalUsd/ this.trans[0].price;
@@ -638,7 +654,7 @@ export default defineComponent({
 
 
      
-      return{trans,walletAddress,getbalanceERC20_all,allbalance,totalUsd,totalETH,getaddress,getwallet,check_balance,collect,onconnect,check_myaddress,my_address,onconnect1,net
+      return{trans,walletAddress,getbalanceERC20_all,allbalance,totalUsd,totalETH,getaddress,getwallet,check_balance,collect,onconnect,check_myaddress,my_address,onconnect1,net,compare
         
       };
     },
